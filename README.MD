@@ -1,4 +1,4 @@
-# pictures of the dataplots below:
+# TA7 VIDEO EXPLANATION
 
-[text](https://drive.google.com/drive/folders/1LH1ncFkxGz1WG3sV4GX6p71wJRkV69l7?usp=sharing)
+[text](https://drive.google.com/drive/folders/17lcvq4ygHna6psWvTMgg_x7zRMiSs9tA?usp=sharing)
 
