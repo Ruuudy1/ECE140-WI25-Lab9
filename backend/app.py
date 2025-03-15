@@ -11,6 +11,7 @@ import uuid
 import requests
 import atexit
 import random
+from os import environ
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -994,7 +995,7 @@ def toggle_favorite(item_id):
         return jsonify({'message': f'Error updating favorite status: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8000))
+    port = int(environ.get('PORT', 10000))
     init_db()
     app.run(host='0.0.0.0', port=port)
 

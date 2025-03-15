@@ -1,13 +1,12 @@
-FROM python:3.9
+FROM python:3.9-slim
 
 WORKDIR /code
 
-COPY ./requirements.txt /code/requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+COPY . .
 
-COPY ./app /code/app
+ENV PORT=10000
 
-COPY ./sample /code/sample
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "backend.app:app"]
