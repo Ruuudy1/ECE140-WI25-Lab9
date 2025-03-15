@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+
+# Secrets
+api_config.py
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>goGogo Wardrobe | Smart Wardrobe Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="landing-page">
+        <header>
+            <div class="logo">
+                <i class="fas fa-tshirt"></i>
+                <h1>goGogoCloset</h1>
+            </div>
+            <div class="auth-buttons">
+                <a href="{{ url_for('login_page') }}" class="btn btn-outline">Login</a>
+                <a href="{{ url_for('signup_page') }}" class="btn btn-primary">Sign Up</a>
+            </div>
+        </header>
+        
+        <main>
+            <section class="hero">
+                <div class="hero-content">
+                    <h1>Your Wardrobe, <span class="highlight">Smarter</span></h1>
+                    <p>Experience the future of wardrobe management with real-time weather data, AI-powered recommendations, and IoT integration.</p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('signup_page') }}" class="btn btn-primary btn-large">Get Started</a>
+                        <a href="#features" class="btn btn-outline btn-large">Learn More</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-cards">
+                        <div class="floating-card weather">
+                            <i class="fas fa-cloud-sun"></i>
+                            <p>22°C</p>
+                            <span>Partly Cloudy</span>
+                        </div>
+                        <div class="floating-card outfit">
+                            <i class="fas fa-tshirt"></i>
+                            <p>Perfect for today</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="features" class="features">
+                <h2>Smart Features for Modern Living</h2>
+                <div class="feature-cards">
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-temperature-high"></i>
+                        </div>
+                        <h3>Environmental Sensing</h3>
+                        <p>Monitor real-time temperature and humidity with ESP32 IoT devices for optimal comfort.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <h3>Smart Wardrobe</h3>
+                        <p>Organize your clothing collection and get AI-powered outfit recommendations based on weather.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3>AI Assistant</h3>
+                        <p>Get personalized style advice and weather-appropriate outfit suggestions from our smart AI.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-cloud-sun-rain"></i>
+                        </div>
+                        <h3>Weather Integration</h3>
+                        <p>Stay prepared with real-time weather updates and forecast-based wardrobe suggestions.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="about-team">
+                <h2>Meet the Team</h2>
+                <div class="team-members">
+                    <div class="team-member">
+                        <div class="member-image">
+                            <img src="../static/images/rudypfp.png" alt="Rudy Osuna">
+                        </div>
+                        <h3>Rudy Osuna</h3>
+                        <p>Software Engineer</p>
+                        <div class="social-links">
+                            <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+                            <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-image">
+                            <img src="../static/images/brayanpfp.png" alt="Brayan Aispuro">
+                        </div>
+                        <h3>Brayan Aispuro</h3>
+                        <p>Electrical Engineer</p>
+                        <div class="social-links">
+                            <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+                            <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>goGogoCloset</h3>
+                    <p>Smart wardrobe management for the modern world</p>
+                </div>
+                <div class="footer-links">
+                    <a href="{{ url_for('login_page') }}">Login</a>
+                    <a href="{{ url_for('signup_page') }}">Sign Up</a>
+                    <a href="#features">Features</a>
+                    <a href="#" class="terms">Terms of Service</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 goGogoCloset. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <style>
+        .landing-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: #2196F3;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .floating-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .floating-card i {
+            font-size: 2rem;
+            color: #2196F3;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            color: #2196F3;
+            margin-bottom: 1rem;
+        }
+
+        .team-members {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .team-member {
+            text-align: center;
+        }
+
+        .member-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 1rem;
+            border: 3px solid #2196F3;
+        }
+
+        .member-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: #666;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #2196F3;
+        }
+
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 3rem 2rem 1rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #2196F3;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .feature-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>
+

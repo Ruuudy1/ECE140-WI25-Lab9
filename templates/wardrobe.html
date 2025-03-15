@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>goGogo Wardrobe | My Wardrobe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('index') }}" class="logo">
+                    <i class="fas fa-tshirt"></i>
+                    <span>goGogoCloset</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="{{ url_for('profile') }}" class="menu-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="{{ url_for('wardrobe') }}" class="menu-item active">
+                    <i class="fas fa-tshirt"></i>
+                    <span>Wardrobe</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="menu-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-outline btn-block">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>My Wardrobe</h1>
+                <div class="header-actions">
+                    <button id="addItemBtn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Add Item
+                    </button>
+                </div>
+            </header>
+            
+            <div class="content-body">
+                <!-- Filters and View Options -->
+                <div class="wardrobe-controls">
+                    <div class="filter-section">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Search items...">
+                        </div>
+                        
+                <div class="filter-group">
+                    <select id="categoryFilter">
+                                <option value="">All Categories</option>
+                        <option value="tops">Tops</option>
+                        <option value="bottoms">Bottoms</option>
+                        <option value="outerwear">Outerwear</option>
+                        <option value="shoes">Shoes</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                
+                    <select id="seasonFilter">
+                                <option value="">All Seasons</option>
+                        <option value="spring">Spring</option>
+                        <option value="summer">Summer</option>
+                        <option value="fall">Fall</option>
+                        <option value="winter">Winter</option>
+                    </select>
+                            
+                            <select id="sortBy">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="name">Name A-Z</option>
+                                <option value="name-desc">Name Z-A</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="view-options">
+                        <button class="btn btn-icon active" data-view="grid">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button class="btn btn-icon" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Wardrobe Items Grid -->
+                <div id="wardrobeItems" class="wardrobe-grid">
+                    <!-- Items will be populated here -->
+                </div>
+            </div>
+        </main>
+    
+    <!-- Add Item Modal -->
+    <div class="modal" id="addItemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Item</h3>
+                <button class="btn-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+                
+            <form id="addItemForm">
+                <div class="form-group">
+                    <label for="itemName">
+                        <i class="fas fa-tag"></i>
+                        Item Name
+                    </label>
+                    <input type="text" id="itemName" name="itemName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="itemCategory">
+                        <i class="fas fa-folder"></i>
+                        Category
+                    </label>
+                    <select id="itemCategory" name="itemCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="tops">Tops</option>
+                        <option value="bottoms">Bottoms</option>
+                        <option value="outerwear">Outerwear</option>
+                        <option value="shoes">Shoes</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                </div>
+                    
+                <div class="form-group">
+                        <label>
+                            <i class="fas fa-sun"></i>
+                            Seasons
+                        </label>
+                        <div class="checkbox-group">
+                            <label class="checkbox">
+                                <input type="checkbox" name="seasons" value="spring">
+                                Spring
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" name="seasons" value="summer">
+                                Summer
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" name="seasons" value="fall">
+                                Fall
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" name="seasons" value="winter">
+                                Winter
+                            </label>
+                        </div>
+                </div>
+                    
+                <div class="form-group">
+                        <label for="itemImage">
+                            <i class="fas fa-image"></i>
+                            Image
+                        </label>
+                        <div class="image-upload">
+                            <input type="file" id="itemImage" name="itemImage" accept="image/*">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Click to upload or drag and drop</span>
+                            </div>
+                            <div class="image-preview" style="display:none;">
+                                <img id="imagePreview" src="" alt="Preview">
+                                <button type="button" class="btn btn-icon" onclick="removeImage()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                </div>
+                    
+                <div class="form-group">
+                        <label for="itemNotes">
+                            <i class="fas fa-sticky-note"></i>
+                            Notes
+                        </label>
+                        <textarea id="itemNotes" name="itemNotes" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Item</button>
+                </div>
+            </form>
+            </div>
+        </div>
+
+        <!-- Quick Actions Menu -->
+        <div class="quick-actions-menu" id="quickActionsMenu" style="display:none;">
+            <button class="btn btn-icon" data-action="edit">
+                <i class="fas fa-edit"></i>
+                Edit
+            </button>
+            <button class="btn btn-icon" data-action="favorite">
+                <i class="fas fa-heart"></i>
+                Favorite
+            </button>
+            <button class="btn btn-icon" data-action="delete">
+                <i class="fas fa-trash"></i>
+                Delete
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        let currentView = 'grid';
+        let selectedItem = null;
+
+        // Load and Display Items
+        async function loadWardrobeItems() {
+            try {
+                const response = await fetch('/api/wardrobe');
+                const items = await response.json();
+                
+                const container = document.getElementById('wardrobeItems');
+                container.className = `wardrobe-${currentView}`;
+                
+                if (items.length === 0) {
+                    container.innerHTML = '<div class="no-items">No items in your wardrobe</div>';
+                    return;
+                }
+                
+                container.innerHTML = items.map(item => `
+                    <div class="wardrobe-item" data-id="${item.id}">
+                        <div class="item-image">
+                            <img src="${item.image_url || '/static/images/placeholder.png'}" alt="${item.name}">
+                            ${item.is_favorite ? '<span class="favorite-badge"><i class="fas fa-heart"></i></span>' : ''}
+                        </div>
+                        <div class="item-info">
+                            <h3>${item.name}</h3>
+                            <p class="item-category">
+                                <i class="fas fa-folder"></i>
+                                ${item.category}
+                            </p>
+                            <div class="item-seasons">
+                                ${item.seasons.map(season => `
+                                    <span class="season-tag">${season}</span>
+                                `).join('')}
+                            </div>
+                            ${item.notes ? `<p class="item-notes">${item.notes}</p>` : ''}
+                        </div>
+                        <button class="btn btn-icon item-menu" onclick="showQuickActions(event, ${item.id})">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading wardrobe items:', error);
+                document.getElementById('wardrobeItems').innerHTML = '<div class="error">Error loading items</div>';
+            }
+        }
+
+        // Quick Actions Menu
+        function showQuickActions(event, itemId) {
+            event.stopPropagation();
+            const menu = document.getElementById('quickActionsMenu');
+            const button = event.currentTarget;
+            const rect = button.getBoundingClientRect();
+            
+            selectedItem = itemId;
+            
+            menu.style.top = `${rect.bottom + window.scrollY}px`;
+            menu.style.left = `${rect.left}px`;
+            menu.style.display = 'flex';
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', closeQuickActions);
+        }
+
+        function closeQuickActions() {
+            const menu = document.getElementById('quickActionsMenu');
+            menu.style.display = 'none';
+            document.removeEventListener('click', closeQuickActions);
+            selectedItem = null; // Reset selected item when closing menu
+        }
+
+        // Modal Management
+        function openModal() {
+            document.getElementById('addItemModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('addItemModal').style.display = 'none';
+            document.getElementById('addItemForm').reset();
+            document.querySelector('.image-preview').style.display = 'none';
+            document.querySelector('.upload-placeholder').style.display = 'flex';
+            
+            // Reset form to add mode
+            document.querySelector('.modal-header h3').textContent = 'Add New Item';
+            document.querySelector('.form-actions .btn-primary').textContent = 'Add Item';
+            
+            // Reset form submit handler to add mode
+            const form = document.getElementById('addItemForm');
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                
+                try {
+                    const formData = {
+                        name: document.getElementById('itemName').value.trim(),
+                        category: document.getElementById('itemCategory').value,
+                        color: '#000000', // Default color
+                        seasons: Array.from(document.querySelectorAll('input[name="seasons"]:checked'))
+                            .map(cb => cb.value),
+                        notes: document.getElementById('itemNotes').value.trim(),
+                        image_url: document.getElementById('imagePreview').src || 'https://via.placeholder.com/150'
+                    };
+
+                    const response = await fetch('/api/wardrobe', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    if (response.ok) {
+                        closeModal();
+                        loadWardrobeItems();
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.message || 'Failed to add item');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An unexpected error occurred');
+                }
+            };
+        }
+
+        // Image Preview
+        document.getElementById('itemImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.querySelector('.image-preview').style.display = 'block';
+                    document.querySelector('.upload-placeholder').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function removeImage() {
+            document.getElementById('itemImage').value = '';
+            document.querySelector('.image-preview').style.display = 'none';
+            document.querySelector('.upload-placeholder').style.display = 'flex';
+        }
+
+        // View Toggle
+        document.querySelectorAll('.view-options .btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const view = this.dataset.view;
+                currentView = view;
+                
+                // Update buttons
+                document.querySelectorAll('.view-options .btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update container class
+                document.getElementById('wardrobeItems').className = `wardrobe-${view}`;
+            });
+        });
+
+        // Filtering and Sorting
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const season = document.getElementById('seasonFilter').value;
+            const sortBy = document.getElementById('sortBy').value;
+            
+            const items = document.querySelectorAll('.wardrobe-item');
+            
+            items.forEach(item => {
+                const itemName = item.querySelector('h3').textContent.toLowerCase();
+                const itemCategory = item.querySelector('.item-category').textContent.toLowerCase();
+                const itemSeasons = Array.from(item.querySelectorAll('.season-tag')).map(tag => tag.textContent.toLowerCase());
+                
+                const matchesSearch = itemName.includes(searchTerm);
+                const matchesCategory = !category || itemCategory.includes(category);
+                const matchesSeason = !season || itemSeasons.includes(season);
+                
+                item.style.display = matchesSearch && matchesCategory && matchesSeason ? 'flex' : 'none';
+            });
+            
+            // Sort items
+            const container = document.getElementById('wardrobeItems');
+            const itemsArray = Array.from(items);
+            
+            itemsArray.sort((a, b) => {
+                const nameA = a.querySelector('h3').textContent;
+                const nameB = b.querySelector('h3').textContent;
+                
+                switch(sortBy) {
+                    case 'name':
+                        return nameA.localeCompare(nameB);
+                    case 'name-desc':
+                        return nameB.localeCompare(nameA);
+                    case 'newest':
+                        return b.dataset.id - a.dataset.id;
+                    case 'oldest':
+                        return a.dataset.id - b.dataset.id;
+                }
+            });
+            
+            itemsArray.forEach(item => container.appendChild(item));
+        }
+
+        // Event Listeners
+        document.getElementById('addItemBtn').addEventListener('click', openModal);
+
+        document.getElementById('addItemForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                // Get form values
+                const formData = {
+                    name: document.getElementById('itemName').value.trim(),
+                    category: document.getElementById('itemCategory').value,
+                    color: '#000000', // Default color
+                    seasons: Array.from(document.querySelectorAll('input[name="seasons"]:checked'))
+                        .map(cb => cb.value),
+                    notes: document.getElementById('itemNotes').value.trim(),
+                    image_url: document.getElementById('imagePreview').src || 'https://via.placeholder.com/150'
+                };
+
+                const response = await fetch('/api/wardrobe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    closeModal();
+                    loadWardrobeItems();
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Failed to add item');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An unexpected error occurred');
+            }
+        });
+
+        ['searchInput', 'categoryFilter', 'seasonFilter', 'sortBy'].forEach(id => {
+            document.getElementById(id).addEventListener('change', applyFilters);
+        });
+
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+        document.getElementById('quickActionsMenu').addEventListener('click', async function(e) {
+            const action = e.target.closest('button')?.dataset.action;
+            if (!action || !selectedItem) return;
+            
+            try {
+                switch(action) {
+                    case 'edit':
+                        // Get the item data
+                        const itemToEdit = document.querySelector(`.wardrobe-item[data-id="${selectedItem}"]`);
+                        if (itemToEdit) {
+                            // Populate the modal with item data
+                            document.getElementById('itemName').value = itemToEdit.querySelector('h3').textContent;
+                            document.getElementById('itemCategory').value = itemToEdit.querySelector('.item-category').textContent.trim();
+                            
+                            // Set seasons
+                            const seasons = Array.from(itemToEdit.querySelectorAll('.season-tag')).map(tag => tag.textContent.toLowerCase());
+                            document.querySelectorAll('input[name="seasons"]').forEach(checkbox => {
+                                checkbox.checked = seasons.includes(checkbox.value);
+                            });
+                            
+                            // Set image if exists
+                            const imageUrl = itemToEdit.querySelector('img').src;
+                            if (imageUrl) {
+                                document.getElementById('imagePreview').src = imageUrl;
+                                document.querySelector('.image-preview').style.display = 'block';
+                                document.querySelector('.upload-placeholder').style.display = 'none';
+                            }
+                            
+                            // Set notes if exists
+                            const notes = itemToEdit.querySelector('.item-notes');
+                            document.getElementById('itemNotes').value = notes ? notes.textContent : '';
+                            
+                            // Update form for edit mode
+                            document.querySelector('.modal-header h3').textContent = 'Edit Item';
+                            document.querySelector('.form-actions .btn-primary').textContent = 'Save Changes';
+                            
+                            // Update form submit handler for edit mode
+                            const form = document.getElementById('addItemForm');
+                            form.onsubmit = async (e) => {
+                                e.preventDefault();
+                                
+                                try {
+                                    const formData = {
+                                        name: document.getElementById('itemName').value.trim(),
+                                        category: document.getElementById('itemCategory').value,
+                                        color: '#000000', // Default color
+                                        seasons: Array.from(document.querySelectorAll('input[name="seasons"]:checked'))
+                                            .map(cb => cb.value),
+                                        notes: document.getElementById('itemNotes').value.trim(),
+                                        image_url: document.getElementById('imagePreview').src || 'https://via.placeholder.com/150'
+                                    };
+
+                                    const response = await fetch(`/api/wardrobe/items/${selectedItem}`, {
+                                        method: 'PUT',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify(formData)
+                                    });
+                                    
+                                    if (response.ok) {
+                                        closeModal();
+                                        loadWardrobeItems();
+                                    } else {
+                                        const error = await response.json();
+                                        throw new Error(error.message || 'Failed to update item');
+                                    }
+                                } catch (error) {
+                                    console.error('Error:', error);
+                                    alert(error.message);
+                                }
+                            };
+                            
+                            openModal();
+                        }
+                        break;
+                    case 'favorite':
+                        try {
+                            const response = await fetch(`/api/wardrobe/items/${selectedItem}/favorite`, {
+                                method: 'POST'
+                            });
+                            
+                            if (!response.ok) {
+                                const error = await response.json();
+                                throw new Error(error.message || 'Failed to update favorite status');
+                            }
+                            
+                            // Reload items to show updated favorite status
+                            await loadWardrobeItems();
+                        } catch (error) {
+                            console.error('Error:', error);
+                            alert(error.message);
+                        }
+                        break;
+                    case 'delete':
+                        if (confirm('Are you sure you want to delete this item?')) {
+                            try {
+                                const response = await fetch(`/api/wardrobe/items/${selectedItem}`, {
+                                    method: 'DELETE'
+                                });
+                                
+                                if (response.status === 404) {
+                                    throw new Error('Item not found. It may have been already deleted.');
+                                }
+                                
+                                if (!response.ok) {
+                                    const error = await response.json();
+                                    throw new Error(error.message || 'Failed to delete item');
+                                }
+                                
+                                // Remove the item from the UI immediately
+                                const itemElement = document.querySelector(`.wardrobe-item[data-id="${selectedItem}"]`);
+                                if (itemElement) {
+                                    itemElement.remove();
+                                }
+                                
+                                // Reload the entire list to ensure consistency
+                                await loadWardrobeItems();
+                            } catch (error) {
+                                console.error('Error:', error);
+                                alert(error.message);
+                            }
+                        }
+                        break;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            }
+            
+            // Always close the menu and reset selected item
+            closeQuickActions();
+        });
+
+        // Initial load
+        loadWardrobeItems();
+    </script>
+
+    <style>
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: #1a1a1a;
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar-header .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #888;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            background: #f5f7fa;
+            padding: 2rem;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Wardrobe Controls */
+        .wardrobe-controls {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-group select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .view-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Wardrobe Grid */
+        .wardrobe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .wardrobe-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .wardrobe-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wardrobe-list .wardrobe-item {
+            flex-direction: row;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .item-image {
+            position: relative;
+            aspect-ratio: 1;
+            overflow: hidden;
+        }
+
+        .wardrobe-list .item-image {
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+        }
+        
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .favorite-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255,255,255,0.9);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e91e63;
+        }
+
+        .item-info {
+            padding: 1rem;
+            flex: 1;
+        }
+
+        .wardrobe-list .item-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 0 1rem;
+        }
+
+        .item-category {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.875rem;
+            margin: 0.5rem 0;
+        }
+
+        .item-seasons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .season-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .item-notes {
+            margin-top: 0.5rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .item-menu {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .item-menu:hover {
+            background: #f5f5f5;
+        }
+
+        /* Quick Actions Menu */
+        .quick-actions-menu {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            flex-direction: column;
+            min-width: 150px;
+            z-index: 1000;
+        }
+
+        .quick-actions-menu button {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-actions-menu button:hover {
+            background: #f5f5f5;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .image-upload {
+            position: relative;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .upload-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            color: #666;
+        }
+
+        .upload-placeholder i {
+            font-size: 2rem;
+        }
+
+        .image-preview {
+            position: relative;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .image-preview .btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .filter-section {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                flex-wrap: wrap;
+            }
+
+            .filter-group select {
+                flex: 1;
+            }
+        }
+    </style>
+</body>
+</html>

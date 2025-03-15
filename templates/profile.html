@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>goGogo Wardrobe | Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <style>
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .device-card {
+            margin-bottom: 20px;
+        }
+
+        .device-form {
+            display: grid;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .device-form input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .devices-container {
+            margin-top: 20px;
+        }
+
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .device-info h4 {
+            margin: 0;
+            color: var(--secondary-color);
+        }
+
+        .device-info p {
+            margin: 5px 0;
+            color: var(--text-light);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .status.online {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+
+        .status.offline {
+            background-color: rgba(158, 158, 158, 0.1);
+            color: #757575;
+        }
+
+        #ai-section {
+            margin-top: 30px;
+        }
+
+        #ai-section textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+
+        #ai-section input[type="number"] {
+            width: 150px;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #textResult, #imageResult {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        #weather-widget {
+            background: linear-gradient(135deg, #6dd5ed, #2193b0);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+
+        #weather-widget button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid white;
+            margin-top: 10px;
+        }
+
+        #weather-widget button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('index') }}" class="logo">
+                    <i class="fas fa-tshirt"></i>
+                    <span>goGogoCloset</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="{{ url_for('profile') }}" class="menu-item active">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="{{ url_for('wardrobe') }}" class="menu-item">
+                    <i class="fas fa-tshirt"></i>
+                    <span>Wardrobe</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="menu-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-outline btn-block">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Profile Settings</h1>
+                <div class="user-menu">
+                    <span class="user-email">{{ email }}</span>
+                    <div class="user-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- User Information Section -->
+                <section class="profile-section">
+                    <h2>User Information</h2>
+                    <div class="card">
+                        <form id="userInfoForm" class="form-grid">
+                            <div class="form-group">
+                                <label for="name">
+                                    <i class="fas fa-user"></i>
+                                    Full Name
+                                </label>
+                                <input type="text" id="name" name="name" value="{{ current_user.name }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">
+                                    <i class="fas fa-envelope"></i>
+                                    Email
+                                </label>
+                                <input type="email" id="email" name="email" value="{{ email }}" readonly>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Location
+                                </label>
+                                <input type="text" id="location" name="location" value="{{ current_user.location }}" required>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Save Changes
+                                </button>
+                        </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Device Management Section -->
+                <section class="profile-section">
+                    <div class="section-header">
+                        <h2>Device Management</h2>
+                        <button id="addDeviceBtn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Add Device
+                        </button>
+                    </div>
+
+                    <!-- Add Device Modal -->
+                    <div class="modal" id="addDeviceModal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>Add New Device</h3>
+                                <button class="btn-close" onclick="closeDeviceModal()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <form id="addDeviceForm">
+                                <div class="form-group">
+                                    <label for="deviceId">Device ID</label>
+                                    <input type="text" id="deviceId" name="deviceId" required>
+                                    <small>Enter the device ID shown in your ESP32's serial monitor</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="deviceName">Device Name</label>
+                                    <input type="text" id="deviceName" name="deviceName" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="deviceLocation">Location</label>
+                                    <input type="text" id="deviceLocation" name="deviceLocation">
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-outline" onclick="closeDeviceModal()">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Add Device</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="device-grid" id="deviceList">
+                        <!-- Device cards will be populated here -->
+                    </div>
+                </section>
+
+                <!-- API Key Section -->
+                <section class="profile-section">
+                    <h2>API Key</h2>
+                    <div class="card">
+                        <div class="api-key-display">
+                            <div class="api-key-field">
+                                <input type="password" id="apiKey" value="{{ pid }}" readonly>
+                                <button class="btn btn-icon" onclick="toggleApiKey()">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-icon" onclick="copyApiKey()">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="api-key-info">
+                                <i class="fas fa-info-circle"></i>
+                                This is your unique API key for device authentication. Keep it secure.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Activity Timeline -->
+                <section class="profile-section">
+                    <h2>Recent Activity</h2>
+                    <div class="timeline" id="activityTimeline">
+                        <!-- Timeline items will be populated here -->
+                </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Device Management
+        let devices = [];
+        let mqttClient = null;
+
+        // MQTT Setup
+        function setupMQTT() {
+            const clientId = "web_" + Math.random().toString(16).substr(2, 8);
+            mqttClient = new Paho.MQTT.Client("broker.hivemq.com", 8000, clientId);
+
+            mqttClient.onConnectionLost = onConnectionLost;
+            mqttClient.onMessageArrived = onMessageArrived;
+
+            const options = {
+                useSSL: false,
+                timeout: 3,
+                onSuccess: onConnect,
+                onFailure: onFailure
+            };
+
+            console.log("Connecting to MQTT broker...");
+            mqttClient.connect(options);
+        }
+
+        function onConnect() {
+            console.log("Connected to MQTT broker");
+            // Subscribe to the sensor readings topic
+            mqttClient.subscribe("avocadobanana/ece140/sensors/readings");
+        }
+
+        function onFailure(error) {
+            console.error("Failed to connect to MQTT broker:", error);
+        }
+
+        function onConnectionLost(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.log("Connection lost:", responseObject.errorMessage);
+                // Try to reconnect
+                setTimeout(setupMQTT, 5000);
+            }
+        }
+
+        function onMessageArrived(message) {
+            console.log("Message received:", message.payloadString);
+            try {
+                const data = JSON.parse(message.payloadString);
+                if (data.device_id && data.temperature) {
+                    // Update device status and temperature
+                    updateDeviceStatus(data);
+                }
+            } catch (error) {
+                console.error("Error processing message:", error);
+            }
+        }
+
+        function updateDeviceStatus(data) {
+            // Send temperature reading to backend
+            fetch('/api/temperature', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    device_id: data.device_id,
+                    temperature: data.temperature,
+                    unit: 'C'
+                })
+            }).then(() => {
+                // After recording temperature, update device status
+                fetch(`/api/devices/ping/${data.device_id}`, {
+                    method: 'POST'
+                }).then(() => {
+                    // Refresh device list to show updated status
+                    loadDevices();
+                });
+            }).catch(error => {
+                console.error('Error updating device status:', error);
+            });
+        }
+
+        // Initialize MQTT when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setupMQTT();
+        });
+
+        function openDeviceModal() {
+            document.getElementById('addDeviceModal').style.display = 'flex';
+        }
+
+        function closeDeviceModal() {
+            document.getElementById('addDeviceModal').style.display = 'none';
+            document.getElementById('addDeviceForm').reset();
+        }
+
+        document.getElementById('addDeviceBtn').addEventListener('click', openDeviceModal);
+
+        // Load and display devices
+        async function loadDevices() {
+            try {
+                const response = await fetch('/api/devices');
+                devices = await response.json();
+                
+                const deviceList = document.getElementById('deviceList');
+                deviceList.innerHTML = devices.map(device => `
+                    <div class="device-card card">
+                        <div class="device-header">
+                            <h3>${device.name}</h3>
+                            <span class="status ${device.is_online ? 'offline': 'online'}">
+                                ${device.is_online ?  'Online': 'Online'}
+                            </span>
+                        </div>
+                        <div class="device-info">
+                            <p><strong>ID:</strong> ${device.device_id}</p>
+                            <p><strong>Location:</strong> ${device.location || 'Not specified'}</p>
+                            <p><strong>Last Seen:</strong> ${device.last_seen ? new Date(device.last_seen).toLocaleString() : 'Never'}</p>
+                        </div>
+                        <div class="device-actions">
+                            <button class="btn btn-danger" onclick="deleteDevice('${device.id}')">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading devices:', error);
+            }
+        }
+
+        // Add new device
+        document.getElementById('addDeviceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const formData = {
+                    device_id: document.getElementById('deviceId').value.trim(),
+                    name: document.getElementById('deviceName').value.trim(),
+                    location: document.getElementById('deviceLocation').value.trim()
+                };
+
+                const response = await fetch('/api/devices', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    closeDeviceModal();
+                    loadDevices();
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Failed to add device');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An unexpected error occurred');
+            }
+        });
+
+        // Delete device
+        async function deleteDevice(deviceId) {
+            if (!confirm('Are you sure you want to delete this device?')) return;
+            
+            try {
+                const response = await fetch(`/api/devices/${deviceId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadDevices();
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Failed to delete device');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An unexpected error occurred');
+            }
+        }
+
+        // API Key Management
+        function toggleApiKey() {
+            const apiKeyInput = document.getElementById('apiKey');
+            const toggleBtn = document.querySelector('.api-key-field .btn-icon i');
+            
+            if (apiKeyInput.type === 'password') {
+                apiKeyInput.type = 'text';
+                toggleBtn.classList.remove('fa-eye');
+                toggleBtn.classList.add('fa-eye-slash');
+            } else {
+                apiKeyInput.type = 'password';
+                toggleBtn.classList.remove('fa-eye-slash');
+                toggleBtn.classList.add('fa-eye');
+            }
+        }
+
+        async function copyApiKey() {
+            const apiKey = document.getElementById('apiKey').value;
+            try {
+                await navigator.clipboard.writeText(apiKey);
+                alert('API key copied to clipboard');
+            } catch (err) {
+                console.error('Failed to copy API key:', err);
+                alert('Failed to copy API key');
+            }
+        }
+
+        document.getElementById('userInfoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                location: document.getElementById('location').value
+            };
+            
+            try {
+                const response = await fetch('/api/user/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    alert('Profile updated successfully');
+                } else {
+                    const data = await response.json();
+                    alert(data.message || 'Failed to update profile');
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('An error occurred while updating your profile');
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    alert('Failed to logout');
+                }
+            } catch (error) {
+                console.error('Error logging out:', error);
+                alert('An error occurred while logging out');
+            }
+        });
+    </script>
+
+    <style>
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: #1a1a1a;
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar-header .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #888;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            background: #f5f7fa;
+            padding: 2rem;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2196F3;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Profile Section Styles */
+        .profile-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Device Grid Styles */
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .device-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .device-header h3 {
+            margin: 0;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .status.online {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status.offline {
+            background-color: #f5f5f5;
+            color: #757575;
+        }
+
+        .device-info {
+            margin-bottom: 15px;
+        }
+
+        .device-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .device-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* API Key Styles */
+        .api-key-display {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .api-key-field {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .api-key-field input {
+            flex: 1;
+            font-family: monospace;
+        }
+
+        .api-key-info {
+            margin-top: 0.5rem;
+            color: #666;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        /* Timeline Styles */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ddd;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>
