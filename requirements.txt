@@ -1,0 +1,13 @@
+fastapi
+pydantic
+uvicorn
+mysql-connector-python
+pandas
+python-dotenv
+fastapi
+uvicorn
+python-dotenv
+mysql-connector-python
+requests
+pydantic
+gunicorn==21.2.0

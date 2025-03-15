@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: your-app-name
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn backend.app:app
+    envVars:
+      - key: DATABASE_URL
+        sync: false  # This tells Render to use the value from the dashboard
+      - key: PYTHON_VERSION
+        value: 3.9.0 
